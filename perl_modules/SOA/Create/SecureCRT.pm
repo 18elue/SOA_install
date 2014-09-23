@@ -35,7 +35,7 @@ sub create_secureCRT_config {
 		
 		my $component = $row->{"Component"};
 	
-		my $file_name = sprintf "$file_dir/%s_%s.ini", $component, $row->{"IP Address"};
+		my $file_name = sprintf "$file_dir/%s_%s_%s.ini", $component, $row->{"IP Address"}, $row->{"App OS Username"};
 		
 		open (my $config_fh, ">", $file_name) or die "cannot create file $file_name : $!";
 		my $file_content = $template_file_content;
