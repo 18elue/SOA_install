@@ -23,7 +23,7 @@ use SOA::Create::UtilScript qw(
 	create_scp_script
 );
 
-use SOA::Constant qw(ORACLE_HOME RELATIVE_DOMAIN_TEMPLATE RELATIVE_WEBLOGIC_CLASSPATH CSV_FILE_NAME);
+use SOA::Constant qw(ORACLE_HOME RELATIVE_DOMAIN_TEMPLATE RELATIVE_WLST_PATH CSV_FILE_NAME);
 
 # dealing with command line options
 my $SOA_flag = 0;
@@ -42,8 +42,8 @@ my $dynamic_property = {
 	DOMAIN_DIR => $beahome."/domains",
 	JAVA_HOME  => $beahome."/jdk",
 	BEAHOME    => $beahome,
-	DOMAIN_TEMPLATE    => $beahome.RELATIVE_DOMAIN_TEMPLATE,
-	WEBLOGIC_CLASSPATH => $beahome.RELATIVE_WEBLOGIC_CLASSPATH,
+	DOMAIN_TEMPLATE => $beahome.RELATIVE_DOMAIN_TEMPLATE,
+	WLST_PATH => $beahome.RELATIVE_WLST_PATH,
 };
 
 

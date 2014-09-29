@@ -41,7 +41,7 @@ sub create_one_input_file {
 	printf $input_file_handler "BEAHOME=%s\n", $dynamic_property->{"BEAHOME"};
 	printf $input_file_handler "DOMAIN_DIR=%s\n", $dynamic_property->{"DOMAIN_DIR"};
 	printf $input_file_handler "DOMAIN_TEMPLATE=%s\n", $dynamic_property->{"DOMAIN_TEMPLATE"};
-	printf $input_file_handler "WEBLOGIC_CLASSPATH=%s\n", $dynamic_property->{"WEBLOGIC_CLASSPATH"};
+	printf $input_file_handler "WLST_PATH=%s\n", $dynamic_property->{"WLST_PATH"};
 	
 	printf $input_file_handler "JAVA_HOME=%s\n", $dynamic_property->{"JAVA_HOME"};;
 	printf $input_file_handler "Xms=%s\n", $admin_server_row->{"Xms(G)"};

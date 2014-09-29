@@ -396,12 +396,18 @@ EXP
 sub config_domain {
 	my ($fh, $prop) = @_;
 	my $domain_name = $prop->{DOMAIN_NAME};
+	
 	my $admin_server_address = $prop->{ADMIN_SERVER_ADDRESS};
 	my $admin_server_port = $prop->{ADMIN_SERVER_PORT};
+	my $admin_server_name = $prop->{ADMIN_SERVER_NAME};
 	my $usr = $prop->{WEBLOGIC_USER};
 	my $pwd = $prop->{WEBLOGIC_PWD};
+	my $URL = "t3://$admin_server_address:$admin_server_port";
+	my $domain_dir = $prop->{DOMAIN_DIR};
+	my $domain_name = $prop->{DOMAIN_NAME};
 	my $connect_str = <<"CONNECT";
-connect('$usr','$pwd','t3://$admin_server_address:$admin_server_port')
+startServer('$admin_server_name', '$domain_name', '$URL', '$usr', '$pwd', '$domain_dir/$domain_name', jvmArgs=' -XX:MaxPermSize=128m')
+connect('$usr','$pwd','$URL')
 print ''
 edit()
 startEdit()

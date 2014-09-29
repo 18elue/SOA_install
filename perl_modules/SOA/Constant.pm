@@ -9,7 +9,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
 	CSV_FILE_NAME
-	ORACLE_HOME RELATIVE_DOMAIN_TEMPLATE RELATIVE_WEBLOGIC_CLASSPATH
+	ORACLE_HOME RELATIVE_DOMAIN_TEMPLATE RELATIVE_WLST_PATH
 	LOG_FILE XMS XMX MAXPERMSIZE 
 	SecureCRT_CONFIG_DIR SecureCRT_TEMPLATE_FILENAME
 	LOG_DISK_MOUNTED_DIR APP_DISK_MOUNTED_DIR LOG_SOFT_LINK APP_SOFT_LINK
@@ -31,7 +31,7 @@ use constant {
 
 use constant {
 	RELATIVE_DOMAIN_TEMPLATE => "/wlserver_10.3/common/templates/domains/wls.jar",
-	RELATIVE_WEBLOGIC_CLASSPATH => "/wlserver_10.3/server/lib/weblogic.jar",
+	RELATIVE_WLST_PATH => "/wlserver_10.3/common/bin/wlst.sh",
 };
 
 use constant {
