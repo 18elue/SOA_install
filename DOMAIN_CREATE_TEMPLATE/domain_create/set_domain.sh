@@ -21,6 +21,3 @@ echo "create domain finished"
 # config domain
 bash $WLST_PATH config_domain.py
 echo "config domain finished"
-
-echo "shuting down admin server"
-ps -ef|grep java|grep -v grep|awk '{print $2}'|xargs kill -9

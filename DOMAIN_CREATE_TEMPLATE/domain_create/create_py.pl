@@ -575,6 +575,7 @@ save()
 activate()
 print ''
 print 'Finished.'
+shutdown(force='true', block='true')
 exit()
 
 POST
