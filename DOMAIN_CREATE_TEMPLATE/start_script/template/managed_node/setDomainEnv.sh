@@ -65,13 +65,13 @@ popd()
 # Console Online Help(http://e-docs.bea.com/wls/docs103/ConsoleHelp/startstop.html).
 # *************************************************************************
 
-WL_HOME="${BEAHOME_SHORTCUT}/wlserver_10.3"
+WL_HOME="${BEAHOME}/wlserver_10.3"
 export WL_HOME
 
 BEA_JAVA_HOME=""
 export BEA_JAVA_HOME
 
-SUN_JAVA_HOME="${BEAHOME_SHORTCUT}/jdk"
+SUN_JAVA_HOME="${BEAHOME}/jdk"
 export SUN_JAVA_HOME
 
 if [ "${JAVA_VENDOR}" = "BEA" ] ; then
@@ -84,7 +84,7 @@ else
 	else
 		JAVA_VENDOR="Sun"
 		export JAVA_VENDOR
-		JAVA_HOME="${BEAHOME_SHORTCUT}/jdk"
+		JAVA_HOME="${BEAHOME}/jdk"
 		export JAVA_HOME
 	fi
 fi

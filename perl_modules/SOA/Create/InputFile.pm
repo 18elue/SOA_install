@@ -4,14 +4,13 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use SOA::Constant qw(BEAHOME_SHORTCUT DOMAIN_DIR DOMAIN_TEMPLATE JAVA_HOME WEBLOGIC_CLASSPATH);
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(create_one_input_file);
 
 sub create_one_input_file {
-	my ($row_aref) = @_;
+	my ($row_aref, $dynamic_property) = @_;
 	
 	# seperate admin server and managed server
 	my @row = @$row_aref;
@@ -39,12 +38,12 @@ sub create_one_input_file {
 	printf $input_file_handler "WEBLOGIC_PWD=%s\n", $admin_server_row->{"Weblogic Password"};
 	printf $input_file_handler "DOMAIN_NAME=%s\n\n", $admin_server_row->{"Domain name"};
 
-	printf $input_file_handler "BEAHOME_SHORTCUT=%s\n", BEAHOME_SHORTCUT;
-	printf $input_file_handler "DOMAIN_DIR=%s\n", DOMAIN_DIR;
-	printf $input_file_handler "DOMAIN_TEMPLATE=%s\n", DOMAIN_TEMPLATE;
-	printf $input_file_handler "WEBLOGIC_CLASSPATH=%s\n", WEBLOGIC_CLASSPATH;
+	printf $input_file_handler "BEAHOME=%s\n", $dynamic_property->{"BEAHOME"};
+	printf $input_file_handler "DOMAIN_DIR=%s\n", $dynamic_property->{"DOMAIN_DIR"};
+	printf $input_file_handler "DOMAIN_TEMPLATE=%s\n", $dynamic_property->{"DOMAIN_TEMPLATE"};
+	printf $input_file_handler "WEBLOGIC_CLASSPATH=%s\n", $dynamic_property->{"WEBLOGIC_CLASSPATH"};
 	
-	printf $input_file_handler "JAVA_HOME=%s\n", JAVA_HOME;
+	printf $input_file_handler "JAVA_HOME=%s\n", $dynamic_property->{"JAVA_HOME"};;
 	printf $input_file_handler "Xms=%s\n", $admin_server_row->{"Xms(G)"};
 	printf $input_file_handler "Xmx=%s\n", $admin_server_row->{"Xmx(G)"};
 	printf $input_file_handler "MaxPermSize=%s\n\n", $admin_server_row->{"XX:MaxPermSize(G)"};

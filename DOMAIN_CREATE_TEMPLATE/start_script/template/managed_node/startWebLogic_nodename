@@ -2,7 +2,7 @@
 
 # check the id is $SERVUSER
 SERVUSER=${SERVUSER}
-BEAHOME=${BEAHOME_SHORTCUT}
+BEAHOME=${BEAHOME}
 echo "checking to make sure $SERVUSER is running this script ..."
 if test "$(/usr/bin/id -un)" == "$SERVUSER"
 then

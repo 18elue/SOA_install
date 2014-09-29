@@ -5,10 +5,10 @@ use warnings;
 
 use Data::Dumper;
 use SOA::Constant qw(
-	ORACLE_HOME DOMAIN_DIR
-	BEAHOME BEAHOME_SHORTCUT
+	ORACLE_HOME
 	LOG_DISK_MOUNTED_DIR APP_DISK_MOUNTED_DIR LOG_SOFT_LINK APP_SOFT_LINK
-	SRC_WLS_FILE_DIR SRC_WLS_FILE_NAME INSTALL_FILE_DIR
+	SRC_WLS_FILE_DIR SRC_WLS_FILE_NAME EXTRACTED_WLS_FILE_NAME INSTALL_FILE_DIR
+	SRC_SOA_FILE_DIR SRC_SOA_FILE_NAME
 );
 require Exporter;
 our @ISA = qw(Exporter);
@@ -20,7 +20,7 @@ our @EXPORT_OK = qw(
 );
 
 sub create_temp_script_for_root {
-	my ($row_aref) = @_;
+	my ($row_aref, $dynamic_property) = @_;
 	my $file_name = "root_temp_script.sh";
 	open (my $fh, ">", $file_name) or die "cannot create > $file_name : $!";
 	printf $fh "rm -rf %s \n", LOG_SOFT_LINK;
@@ -29,29 +29,32 @@ sub create_temp_script_for_root {
 	printf $fh "ln -s %s %s \n", APP_DISK_MOUNTED_DIR, APP_SOFT_LINK;	
 	printf $fh "chown -R %s:%s %s \n", $row_aref->[0]->{"App OS Username"}, $row_aref->[0]->{"Group name"}, LOG_DISK_MOUNTED_DIR;
 	printf $fh "chown -R %s:%s %s \n", $row_aref->[0]->{"App OS Username"}, $row_aref->[0]->{"Group name"}, APP_DISK_MOUNTED_DIR;
-	printf $fh "rm -rf %s \n", BEAHOME_SHORTCUT;
+	printf $fh "rm -rf %s \n", $dynamic_property->{"BEAHOME"};
 	close $fh;
 }
 
 sub create_temp_script_for_user {
-	my ($row_aref) = @_;
+	my ($row_aref, $dynamic_property, $SOA_flag) = @_;
 	my $file_name = "user_temp_script.sh";
 	open (my $fh, ">", $file_name) or die "cannot create > $file_name : $!";
-	printf $fh "scp -r %s %s \n", SRC_WLS_FILE_DIR.SRC_WLS_FILE_NAME, ORACLE_HOME;
-	printf $fh "tar -xf %s -C %s \n", ORACLE_HOME.SRC_WLS_FILE_NAME, ORACLE_HOME;
-	printf $fh "ln -s %s %s \n", BEAHOME, BEAHOME_SHORTCUT;
-	printf $fh "rm -rf %s \n", ORACLE_HOME.SRC_WLS_FILE_NAME;
+	if ($SOA_flag) {
+		printf $fh "scp -r %s %s \n", SRC_SOA_FILE_DIR.SRC_SOA_FILE_NAME, ORACLE_HOME;
+		printf $fh "tar -xf %s -C %s \n", ORACLE_HOME.SRC_SOA_FILE_NAME, ORACLE_HOME;
+		printf $fh "rm -rf %s \n", ORACLE_HOME.SRC_SOA_FILE_NAME;
+	} else {
+		printf $fh "scp -r %s %s \n", SRC_WLS_FILE_DIR.SRC_WLS_FILE_NAME, ORACLE_HOME;
+		printf $fh "tar -xf %s -C %s \n", ORACLE_HOME.SRC_WLS_FILE_NAME, ORACLE_HOME;
+		printf $fh "rm -rf %s \n", ORACLE_HOME.SRC_WLS_FILE_NAME;
+		printf $fh "ln -s %s %s \n", ORACLE_HOME.EXTRACTED_WLS_FILE_NAME, $dynamic_property->{"BEAHOME"};
+	}
 #	printf $fh "chmod -R 777 %s \n", LOG_DISK_MOUNTED_DIR;
 #	printf $fh "chmod -R 777 %s \n", APP_DISK_MOUNTED_DIR;
 	close $fh;
 }
 
-
-
-
 # this func is used to create extra shell command like create log dir
 sub create_other_info_script {
-	my ($row_aref, $weblogic_install_dir) = @_;
+	my ($row_aref, $weblogic_install_dir, $dynamic_property) = @_;
 
 	# get all hosts
 	my @host;
@@ -71,7 +74,7 @@ sub create_other_info_script {
 	# create log dir
 	for my $row (@$row_aref) {
 		my $host = $row->{"IP Address"};
-		my $node_log_dir = sprintf "%s/%s/servers/%s/logs", DOMAIN_DIR, $row->{"Domain name"}, $row->{"Instance Name"};
+		my $node_log_dir = sprintf "%s/%s/servers/%s/logs", $dynamic_property->{"DOMAIN_DIR"}, $row->{"Domain name"}, $row->{"Instance Name"};
 
 		printf {$ip_to_file_handler{$host}} "#create log dir\n";
 		printf {$ip_to_file_handler{$host}} "#node %s\n", $row->{"Instance Name"};
@@ -84,7 +87,7 @@ sub create_other_info_script {
 	# copy start script
 	for my $host (keys %ip_to_file_handler) {
 		printf {$ip_to_file_handler{$host}} "#copy start script\n";
-		printf {$ip_to_file_handler{$host}} "cp %s/%s/start_script/$host/* %s/%s/bin\n\n", INSTALL_FILE_DIR, $weblogic_install_dir, DOMAIN_DIR, $row_aref->[0]->{"Domain name"};
+		printf {$ip_to_file_handler{$host}} "cp %s/%s/start_script/$host/* %s/%s/bin\n\n", INSTALL_FILE_DIR, $weblogic_install_dir, $dynamic_property->{"DOMAIN_DIR"}, $row_aref->[0]->{"Domain name"};
 	}
 	
 	# close file handler

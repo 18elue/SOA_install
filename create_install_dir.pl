@@ -2,8 +2,8 @@
 use strict;
 use warnings;
 
+use Getopt::Long;
 use lib 'perl_modules';
-#use Cwd; #get pathname of current working directory
 use Data::Dumper;
 
 use SOA::Install::Util qw(
@@ -23,7 +23,29 @@ use SOA::Create::UtilScript qw(
 	create_scp_script
 );
 
-use SOA::Constant qw(CSV_FILE_NAME);
+use SOA::Constant qw(ORACLE_HOME RELATIVE_DOMAIN_TEMPLATE RELATIVE_WEBLOGIC_CLASSPATH CSV_FILE_NAME);
+
+# dealing with command line options
+my $SOA_flag = 0;
+GetOptions(
+	"SOA" => \$SOA_flag,  # to install SOA, need to set SOA flag
+	) 
+or die ("Error in command line arguments\n");
+
+my $beahome;
+if ($SOA_flag) {
+	$beahome = ORACLE_HOME.'mw';
+} else {
+	$beahome = ORACLE_HOME.'wls-latest';
+}
+my $dynamic_property = {
+	DOMAIN_DIR => $beahome."/domains",
+	JAVA_HOME  => $beahome."/jdk",
+	BEAHOME    => $beahome,
+	DOMAIN_TEMPLATE    => $beahome.RELATIVE_DOMAIN_TEMPLATE,
+	WEBLOGIC_CLASSPATH => $beahome.RELATIVE_WEBLOGIC_CLASSPATH,
+};
+
 
 # read data from csv file, get hash data with first list be the key
 my $list_data_aref = get_data_from_csv(CSV_FILE_NAME);
@@ -43,14 +65,14 @@ my $group_data_aref = divide_into_domains($hash_data_aref);
 my $scp_script_filename = "scp.sh";
 open (my $scp_file_handler, ">", $scp_script_filename) or die "cannot create > $scp_script_filename : $!";	
 for my $domain_aref (@$group_data_aref) {
-	my $weblogic_install_dir = create_one_input_file($domain_aref);
-	create_other_info_script($domain_aref, $weblogic_install_dir);
+	my $weblogic_install_dir = create_one_input_file($domain_aref, $dynamic_property);
+	create_other_info_script($domain_aref, $weblogic_install_dir, $dynamic_property);
 	create_secureCRT_config($domain_aref);
 	create_scp_script($scp_file_handler, $domain_aref, $weblogic_install_dir);
 	
 	#this is temporary used
-	create_temp_script_for_root($domain_aref);
-	create_temp_script_for_user($domain_aref);
+	create_temp_script_for_root($domain_aref, $dynamic_property);
+	create_temp_script_for_user($domain_aref, $dynamic_property, $SOA_flag);
 	system "./create_weblogic_install_dir.bash", $weblogic_install_dir;
 }
 close $scp_file_handler;

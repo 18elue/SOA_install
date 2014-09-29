@@ -4,7 +4,7 @@
 PATH=$PATH:/usr/bin:/bin:/usr/sbin:/usr/local/bin
 
 SERVUSER=${SERVUSER}
-BEAHOME=${BEAHOME_SHORTCUT}
+BEAHOME=${BEAHOME}
 
 printusage()
 {
