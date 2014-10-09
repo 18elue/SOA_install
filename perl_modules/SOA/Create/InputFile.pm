@@ -23,13 +23,6 @@ sub create_one_input_file {
 		exit 1;
 	}
 	
-	# get all machines
-	my @machine;
-	for my $row(@$row_aref) {
-		push @machine, $row->{"Zone Name"};
-	}
-	@machine = do { my %seen; grep { !$seen{$_}++ } @machine };
-
 	# create input.properties file
 	my $input_file_name = "input.properties";
 	open (my $input_file_handler, ">", $input_file_name) or die "cannot create > $input_file_name : $!";
@@ -53,8 +46,18 @@ sub create_one_input_file {
 	printf $input_file_handler "ADMIN_SERVER_ADDRESS=%s\n\n", $admin_server_row->{"IP Address"};
 	printf $input_file_handler "ADMIN_LOG_DIR=%s\n\n", $admin_server_row->{"Log File"};
 
-	printf $input_file_handler "MACHINE=%s\n\n", join(',', @machine);
-
+	if ($dynamic_property->{"create_machine_flag"}) {
+		# get all machines
+		my @machine;
+		for my $row(@$row_aref) {
+			push @machine, $row->{"Zone Name"};
+		}
+		@machine = do { my %seen; grep { !$seen{$_}++ } @machine };
+		
+		# set machine property
+		printf $input_file_handler "MACHINE=%s\n\n", join(',', @machine);
+	}
+	
 	## print managed server info
 	my @managed_server_key;
 	for my $num (1..@managed_server_row) {

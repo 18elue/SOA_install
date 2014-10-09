@@ -15,7 +15,11 @@ explanation_crt($fh_crt, $fn_crt);
 import_file($fh_crt);
 prepare($fh_crt, $property_href);
 set_admin_server($fh_crt, $property_href);
-create_machines($fh_crt, $property_href);
+
+if ($property_href->{"MACHINE"}) {
+	create_machines($fh_crt, $property_href);
+}
+
 create_managed_server($fh_crt, $property_href);
 create_cluster($fh_crt, $property_href);
 post_set($fh_crt, $property_href);
@@ -68,21 +72,23 @@ sub read_property_file {
 		exit;
 	}
 
-	# create index for machines
-	my $machine_href = {};
-	my $i=1;
-	for my $server (@$managed_server_aref) {
-		my $machine = $server->{machine};
-		if (!$machine_href->{$machine}) {
-			$machine_href->{$machine} = $i;
-			$i++;
+	if ($prop->{MACHINE}) {
+		# create index for machines
+		my $machine_href = {};
+		my $i=1;
+		for my $server (@$managed_server_aref) {
+			my $machine = $server->{machine};
+			if (!$machine_href->{$machine}) {
+				$machine_href->{$machine} = $i;
+				$i++;
+			}
 		}
+		$prop->{MACHINE_HREF} = $machine_href;
 	}
-	$prop->{MACHINE_HREF} = $machine_href;
 	
 	# create structured data of cluster
 	my $cluster_href = {};
-	$i=1;
+	my $i=1;
 	for my $server (@$managed_server_aref) {
 		my $cluster = $server->{cluster};
 		last unless $cluster;
@@ -252,7 +258,6 @@ sub create_managed_server {
 		my $port = $server->{port};
 		my $address = $server->{address};
 		my $machine = $server->{machine};
-		my $machine_num = $prop->{MACHINE_HREF}->{$machine};
 		my $string =<<"MANAGED_SERVER";
 ms_name_$num = '$name'
 print 'Creating managed server: ' + ms_name_$num
@@ -261,13 +266,18 @@ ms$num = create(ms_name_$num, 'Server')
 ms$num.listenPort = int('$port')
 ms$num.listenAddress = '$address'
 
-# Associate managed server $num with machine $machine_num.
-if ms$num != None and machine_$machine_num != None:
-	ms$num.machine = machine_$machine_num
-
-
 MANAGED_SERVER
 		print $fh $string;
+		
+		if ($prop->{MACHINE_HREF}) {
+			my $machine_num = $prop->{MACHINE_HREF}->{$machine};			
+			$string =<<"MACHINE";
+# Associate managed server $num with machine $machine_num.
+if ms$num != None and machine_$machine_num != None:
+	ms$num.machine = machine_$machine_num		
+MACHINE
+			print $fh $string;
+		}
 	}
 	print $fh "print ''\n\n\n";
 }

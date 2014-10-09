@@ -32,11 +32,13 @@ GetOptions(
 	) 
 or die ("Error in command line arguments\n");
 
-my $beahome;
+my ($beahome, $create_machine_flag);
 if ($SOA_flag) {
 	$beahome = ORACLE_HOME.'mw';
+	$create_machine_flag = 0;
 } else {
 	$beahome = ORACLE_HOME.'wls-latest';
+	$create_machine_flag = 1;
 }
 my $dynamic_property = {
 	DOMAIN_DIR => $beahome."/domains",
@@ -44,6 +46,7 @@ my $dynamic_property = {
 	BEAHOME    => $beahome,
 	DOMAIN_TEMPLATE => $beahome.RELATIVE_DOMAIN_TEMPLATE,
 	WLST_PATH => $beahome.RELATIVE_WLST_PATH,
+	create_machine_flag => $create_machine_flag,
 };
 
 
