@@ -84,7 +84,7 @@ sub create_one_input_file {
 
 	close $input_file_handler;
 	
-	my $dir = sprintf "%s_domain_%s_create", $admin_server_row->{"Component"}, $admin_server_row->{"Domain name"};
+	my $dir = sprintf "%s_domain_%s_create_%s", $admin_server_row->{"Component"}, $admin_server_row->{"Domain name"}, $admin_server_row->{"IP Address"};
 	return $dir;
 }
 
