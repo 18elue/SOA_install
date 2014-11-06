@@ -102,6 +102,7 @@ sub create_scp_script {
 	
 	for my $row (@uniq_host_row) {
 		printf $file_handler "scp -r %s %s@%s:%s\n", $weblogic_install_dir, $row->{"App OS Username"}, $row->{"IP Address"}, INSTALL_FILE_DIR;
+		printf $file_handler "ssh %s@%s 'cd %s%s/domain_create && ./set_domain.sh > script_run_result.log &'\n", $row->{"App OS Username"}, $row->{"IP Address"}, INSTALL_FILE_DIR, $weblogic_install_dir;
 	}	
 }
 
