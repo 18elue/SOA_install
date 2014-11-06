@@ -210,13 +210,13 @@ fi
 WLS_HOME="${WL_HOME}/server"
 export WLS_HOME
 
-MEM_ARGS="-Xms1024m -Xmx1024m"
+MEM_ARGS="-Xms${ADMIN_SERVER_XMS}m -Xmx${ADMIN_SERVER_XMX}m"
 export MEM_ARGS
 
 MEM_PERM_SIZE="-XX:PermSize=128m"
 export MEM_PERM_SIZE
 
-MEM_MAX_PERM_SIZE="-XX:MaxPermSize=256m"
+MEM_MAX_PERM_SIZE="-XX:MaxPermSize=${ADMIN_SERVER_MAXPERMSIZE}m"
 export MEM_MAX_PERM_SIZE
 
 if [ "${JAVA_VENDOR}" = "Sun" ] ; then

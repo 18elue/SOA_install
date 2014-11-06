@@ -140,7 +140,7 @@ echo "."
 
 echo "."
 
-MEM_ARGS="-Xms${Xms}m -Xmx${Xmx}m -XX:NewRatio=4 -XX:SurvivorRatio=4 -XX:TargetSurvivorRatio=80 -XX:+DisableExplicitGC -XX:MaxPermSize=${MaxPermSize}m"
+MEM_ARGS="-Xms${MANAGED_SERVER_XMS}m -Xmx${MANAGED_SERVER_XMX}m -XX:NewRatio=4 -XX:SurvivorRatio=4 -XX:TargetSurvivorRatio=80 -XX:+DisableExplicitGC -XX:MaxPermSize=${MANAGED_SERVER_MAXPERMSIZE}m"
 
 echo "JAVA Memory arguments: ${MEM_ARGS}"
 

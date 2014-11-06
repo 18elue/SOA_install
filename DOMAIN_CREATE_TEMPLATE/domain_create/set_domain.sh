@@ -1,23 +1,19 @@
 #!/bin/bash
 
-# this script is used to create domains
+# this script is used to create and config domains
 
 
 # set env variable from input file
-source input.properties
+source wls_input.properties
 DOMAIN_HOME=$DOMAIN_DIR/$DOMAIN_NAME
 
 #check if domain alread exists
 [[ -e $DOMAIN_HOME ]] && echo "domain $DOMAIN_NAME already exists, exit now" && exit
 
-
-# get create_domain.py config_domain.py
-./create_py.pl
-
 # create domain
-bash $WLST_PATH create_domain.py
-echo "create domain finished"
+bash $WLST_PATH create_wls_domain.py 
 
-# config domain
-bash $WLST_PATH config_domain.py
-echo "config domain finished"
+# execute other info script
+ip=$(hostname -i)
+ip=${ip//./_}
+bash other_info_$ip.sh

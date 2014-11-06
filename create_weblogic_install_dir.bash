@@ -4,16 +4,16 @@
 # get dir name
 weblogic_install_dir=$1
 
-# create dir from TEMPLATE, add file input.properties, other_info.sh to dir
+# create dir from TEMPLATE, add file wls_input.properties, other_info.sh to dir
 [[ -e $weblogic_install_dir ]] && rm -rf $weblogic_install_dir && echo "dir $weblogic_install_dir deleted"
 cp -r DOMAIN_CREATE_TEMPLATE $weblogic_install_dir
-mv input.properties $weblogic_install_dir/domain_create
+mv wls_input.properties $weblogic_install_dir/domain_create
 mv other_info*.sh $weblogic_install_dir/domain_create
 mv root_temp_script.sh $weblogic_install_dir/domain_create
 mv user_temp_script.sh $weblogic_install_dir/domain_create
 
 # create start script
-source $weblogic_install_dir/domain_create/input.properties
+source $weblogic_install_dir/domain_create/wls_input.properties
 
 ## create admin server start script
 script_home=/home/6375ly/SOA_install_script/$weblogic_install_dir/start_script
@@ -29,12 +29,18 @@ sed -i "s%\${ADMIN_SERVER_NAME}%$ADMIN_SERVER_NAME%g" $(grep \${ADMIN_SERVER_NAM
 sed -i "s%\${WEBLOGIC_USER}%$WEBLOGIC_USER%g" $(grep \${WEBLOGIC_USER} -l *)
 sed -i "s%\${WEBLOGIC_PWD}%$WEBLOGIC_PWD%g" $(grep \${WEBLOGIC_PWD} -l *)
 sed -i "s%\${ADMIN_LOG_DIR}%$ADMIN_LOG_DIR%g" $(grep \${ADMIN_LOG_DIR} -l *)
+sed -i "s%\${ADMIN_SERVER_XMS}%$ADMIN_SERVER_XMS%g" $(grep \${ADMIN_SERVER_XMS} -l *)
+sed -i "s%\${ADMIN_SERVER_XMX}%$ADMIN_SERVER_XMX%g" $(grep \${ADMIN_SERVER_XMX} -l *)
+sed -i "s%\${ADMIN_SERVER_MAXPERMSIZE}%$ADMIN_SERVER_MAXPERMSIZE%g" $(grep \${ADMIN_SERVER_MAXPERMSIZE} -l *)
 
 ## create managed server start script
 index=1;
 for MANAGED_SERVER_NAME in ${MANAGED_SERVER_NAMES[@]};do
 	log_dir_key=MANAGED_SERVER_${index}_LOG_DIR
 	address_key=MANAGED_SERVER_${index}_ADDRESS
+	Xms_key=MANAGED_SERVER_${index}_XMS
+	Xmx_key=MANAGED_SERVER_${index}_XMX
+	MaxPermSize=MANAGED_SERVER_${index}_MAXPERMSIZE
 	index=$(($index+1))
 	
 	[[ -e $script_home/${!address_key} ]] || mkdir $script_home/${!address_key}
@@ -50,11 +56,17 @@ for MANAGED_SERVER_NAME in ${MANAGED_SERVER_NAMES[@]};do
 	sed -i "s%\${ADMIN_SERVER_NAME}%$ADMIN_SERVER_NAME%g" $(grep \${ADMIN_SERVER_NAME} -l *)
 	sed -i "s%\${WEBLOGIC_USER}%$WEBLOGIC_USER%g" $(grep \${WEBLOGIC_USER} -l *)
 	sed -i "s%\${WEBLOGIC_PWD}%$WEBLOGIC_PWD%g" $(grep \${WEBLOGIC_PWD} -l *)
+	
+	# this is set for script setDomainEnv.sh
+	sed -i "s%\${ADMIN_SERVER_XMS}%$ADMIN_SERVER_XMS%g" $(grep \${ADMIN_SERVER_XMS} -l *)
+	sed -i "s%\${ADMIN_SERVER_XMX}%$ADMIN_SERVER_XMX%g" $(grep \${ADMIN_SERVER_XMX} -l *)
+	sed -i "s%\${ADMIN_SERVER_MAXPERMSIZE}%$ADMIN_SERVER_MAXPERMSIZE%g" $(grep \${ADMIN_SERVER_MAXPERMSIZE} -l *)
+	
 	sed -i "s%\${MANAGED_SERVER_NAME}%$MANAGED_SERVER_NAME%g" $(grep \${MANAGED_SERVER_NAME} -l *)
 	sed -i "s%\${MANAGED_SERVER_LOG_DIR}%${!log_dir_key}%g" $(grep \${MANAGED_SERVER_LOG_DIR} -l *)
-	sed -i "s%\${Xms}%$Xms%g" $(grep \${Xms} -l *)
-	sed -i "s%\${Xmx}%$Xmx%g" $(grep \${Xmx} -l *)
-	sed -i "s%\${MaxPermSize}%$MaxPermSize%g" $(grep \${MaxPermSize} -l *)	
+	sed -i "s%\${MANAGED_SERVER_XMS}%${!Xms_key}%g" $(grep \${MANAGED_SERVER_XMS} -l *)
+	sed -i "s%\${MANAGED_SERVER_XMX}%${!Xmx_key}%g" $(grep \${MANAGED_SERVER_XMX} -l *)
+	sed -i "s%\${MANAGED_SERVER_MAXPERMSIZE}%${!MaxPermSize}%g" $(grep \${MANAGED_SERVER_MAXPERMSIZE} -l *)	
 	
 	# change file names
 	for file_name in *; do

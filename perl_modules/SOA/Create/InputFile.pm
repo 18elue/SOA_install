@@ -24,7 +24,7 @@ sub create_one_input_file {
 	}
 	
 	# create input.properties file
-	my $input_file_name = "input.properties";
+	my $input_file_name = "wls_input.properties";
 	open (my $input_file_handler, ">", $input_file_name) or die "cannot create > $input_file_name : $!";
 
 	printf $input_file_handler "WEBLOGIC_USER=weblogic\n";
@@ -35,16 +35,16 @@ sub create_one_input_file {
 	printf $input_file_handler "DOMAIN_DIR=%s\n", $dynamic_property->{"DOMAIN_DIR"};
 	printf $input_file_handler "DOMAIN_TEMPLATE=%s\n", $dynamic_property->{"DOMAIN_TEMPLATE"};
 	printf $input_file_handler "WLST_PATH=%s\n", $dynamic_property->{"WLST_PATH"};
-	
-	printf $input_file_handler "JAVA_HOME=%s\n", $dynamic_property->{"JAVA_HOME"};;
-	printf $input_file_handler "Xms=%s\n", $admin_server_row->{"Xms(G)"};
-	printf $input_file_handler "Xmx=%s\n", $admin_server_row->{"Xmx(G)"};
-	printf $input_file_handler "MaxPermSize=%s\n\n", $admin_server_row->{"XX:MaxPermSize(G)"};
-			
+	printf $input_file_handler "JAVA_HOME=%s\n\n", $dynamic_property->{"JAVA_HOME"};;
+
 	printf $input_file_handler "ADMIN_SERVER_NAME=%s\n", $admin_server_row->{"Instance Name"};
 	printf $input_file_handler "ADMIN_SERVER_PORT=%s\n", $admin_server_row->{"HTTP Port"};
-	printf $input_file_handler "ADMIN_SERVER_ADDRESS=%s\n\n", $admin_server_row->{"IP Address"};
-	printf $input_file_handler "ADMIN_LOG_DIR=%s\n\n", $admin_server_row->{"Log File"};
+	printf $input_file_handler "ADMIN_SERVER_HTTPS_PORT=%s\n", $admin_server_row->{"HTTPS Port"};
+	printf $input_file_handler "ADMIN_SERVER_ADDRESS=%s\n", $admin_server_row->{"IP Address"};
+	printf $input_file_handler "ADMIN_LOG_DIR=%s\n", $admin_server_row->{"Log File"};
+	printf $input_file_handler "ADMIN_SERVER_XMS=%s\n", $admin_server_row->{"Xms(G)"};
+	printf $input_file_handler "ADMIN_SERVER_XMX=%s\n", $admin_server_row->{"Xmx(G)"};
+	printf $input_file_handler "ADMIN_SERVER_MAXPERMSIZE=%s\n\n", $admin_server_row->{"XX:MaxPermSize(G)"};
 
 	if ($dynamic_property->{"create_machine_flag"}) {
 		# get all machines
@@ -73,7 +73,10 @@ sub create_one_input_file {
 		printf $input_file_handler "MANAGED_SERVER_%d_ADDRESS=%s\n", $index, $managed_server->{"IP Address"};
 		printf $input_file_handler "MANAGED_SERVER_%d_MACHINE=%s\n", $index, $managed_server->{"Zone Name"};
 		printf $input_file_handler "MANAGED_SERVER_%d_CLUSTER=%s\n", $index, $managed_server->{"Cluster name"};
-		printf $input_file_handler "MANAGED_SERVER_%d_LOG_DIR=%s\n\n", $index, $managed_server->{"Log File"};
+		printf $input_file_handler "MANAGED_SERVER_%d_LOG_DIR=%s\n", $index, $managed_server->{"Log File"};
+		printf $input_file_handler "MANAGED_SERVER_%d_XMS=%s\n", $index, $managed_server->{"Xms(G)"};
+		printf $input_file_handler "MANAGED_SERVER_%d_XMX=%s\n", $index, $managed_server->{"Xmx(G)"};
+		printf $input_file_handler "MANAGED_SERVER_%d_MAXPERMSIZE=%s\n\n", $index, $managed_server->{"XX:MaxPermSize(G)"};
 		$index += 1;
 	}
 
