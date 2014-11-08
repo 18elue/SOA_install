@@ -21,6 +21,8 @@ use SOA::Create::UtilScript qw(
 	create_temp_script_for_user
 	create_other_info_script
 	create_scp_script
+	cp_domain
+	run_other_info
 );
 
 use SOA::Constant qw(ORACLE_HOME RELATIVE_DOMAIN_TEMPLATE RELATIVE_WLST_PATH CSV_FILE_NAME);
@@ -70,6 +72,8 @@ open (my $scp_file_handler, ">", $scp_script_filename) or die "cannot create > $
 for my $domain_aref (@$group_data_aref) {
 	my $weblogic_install_dir = create_one_input_file($domain_aref, $dynamic_property);
 	create_other_info_script($domain_aref, $weblogic_install_dir, $dynamic_property);
+	cp_domain($domain_aref, $weblogic_install_dir, $dynamic_property);
+	run_other_info($domain_aref, $weblogic_install_dir, $dynamic_property);
 	create_secureCRT_config($domain_aref);
 	create_scp_script($scp_file_handler, $domain_aref, $weblogic_install_dir);
 	

@@ -60,8 +60,16 @@ def set_server(names):
             if ms_cluster not in cluster_status:
                 print 'Createing cluster: ' + ms_cluster
                 cluster_status[ms_cluster] = create(ms_cluster, 'Cluster')
+                cluster_status[ms_cluster].multicastPort = int('7777')
+                cluster_status[ms_cluster].multicastAddress = '239.192.0.1'
+                cluster_status[ms_cluster].weblogicPluginEnabled = 1
             print 'Assigning managed servers: (%s) to cluster: %s' % (ms_name, ms_cluster)
             assign('Server', ms_name, 'Cluster', ms_cluster)
+            one_address = '%s:%s' % (ms_address, ms_port)
+            if cluster_status[ms_cluster].clusterAddress:
+                cluster_status[ms_cluster].clusterAddress = cluster_status[ms_cluster].clusterAddress + ',' + one_address
+            else:
+                cluster_status[ms_cluster].clusterAddress = one_address
             print ''
     return cluster_status
 

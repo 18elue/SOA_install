@@ -8,12 +8,21 @@ source wls_input.properties
 DOMAIN_HOME=$DOMAIN_DIR/$DOMAIN_NAME
 
 #check if domain alread exists
-[[ -e $DOMAIN_HOME ]] && echo "domain $DOMAIN_NAME already exists, exit now" && exit
+#[[ -e $DOMAIN_HOME ]] && echo "domain $DOMAIN_NAME already exists, exit now" && exit
 
+ip=$(hostname -i)
 # create domain
-bash $WLST_PATH create_wls_domain.py 
+if [[ $ADMIN_SERVER_ADDRESS = $ip ]]; then
+    bash $WLST_PATH create_wls_domain.py
+    expect cp_domain.expect
+fi 
 
 # execute other info script
-ip=$(hostname -i)
-ip=${ip//./_}
-bash other_info_$ip.sh
+replaced_ip=${ip//./_}
+bash other_info_$replaced_ip.sh
+
+sleep 10
+
+if [[ $ADMIN_SERVER_ADDRESS = $ip ]]; then
+    expect run_other_info.expect
+fi 

@@ -17,6 +17,8 @@ our @EXPORT_OK = qw(
 	create_temp_script_for_user
 	create_other_info_script
 	create_scp_script
+	cp_domain
+	run_other_info
 );
 
 sub create_temp_script_for_root {
@@ -63,6 +65,9 @@ sub create_other_info_script {
 	}
 	@host = do { my %seen; grep { !$seen{$_}++ } @host };
 	
+	my @row = @$row_aref;
+	my $admin_server_row = shift @row;
+	
 	my %ip_to_file_handler;
 	for my $host (@host) {
 		my $host_name = $host;
@@ -83,26 +88,116 @@ sub create_other_info_script {
 		printf {$ip_to_file_handler{$host}} "ln -s %s %s && echo \"soft link for %s created\"\n\n", $row->{"Log File"}, $node_log_dir, $row->{"Instance Name"};
 	}
 	
-	# copy start script
+	# copy start script 
 	for my $host (keys %ip_to_file_handler) {
 		printf {$ip_to_file_handler{$host}} "#copy start script\n";
-		printf {$ip_to_file_handler{$host}} "cp %s/%s/start_script/$host/* %s/%s/bin && echo \"cp start script finished\" \n", INSTALL_FILE_DIR, $weblogic_install_dir, $dynamic_property->{"DOMAIN_DIR"}, $row_aref->[0]->{"Domain name"};
+		printf {$ip_to_file_handler{$host}} "cp %s/%s/start_script/$host/* %s/%s/bin && echo \"cp start script finished\" \n\n", INSTALL_FILE_DIR, $weblogic_install_dir, $dynamic_property->{"DOMAIN_DIR"}, $row_aref->[0]->{"Domain name"};
 	}
+	
+	# start admin server
+	my $admin_ip = $admin_server_row->{"IP Address"};
+	printf {$ip_to_file_handler{$admin_ip}} "#start admin server\n";
+	printf {$ip_to_file_handler{$admin_ip}} "%s/%s/bin/start\n", $dynamic_property->{"DOMAIN_DIR"}, $row_aref->[0]->{"Domain name"};
+	printf {$ip_to_file_handler{$admin_ip}} "sleep 30\n\n";
+	printf {$ip_to_file_handler{$admin_ip}} "#start managed server\n";
+	
+	# start managed server	
+	for my $row (@row) {	
+		my $host = $row->{"IP Address"};
+		printf {$ip_to_file_handler{$host}} "%s/%s/bin/start_%s;", $dynamic_property->{"DOMAIN_DIR"},$row->{"Domain name"},$row->{"Instance Name"};
+	}	
 	
 	# close file handler
 	map { close $_ } values %ip_to_file_handler; 
 }
 
+# this func is used to copy domain dir to other managed servers
+sub cp_domain {
+	my ($row_aref, $weblogic_install_dir, $dynamic_property) = @_;
+	
+	# create expect script to copy domain and execute other info script
+	my $file_name = "cp_domain.expect";
+	open (my $fh, ">", $file_name) or die "cannot create > $file_name : $!";
+	printf $fh "#!/usr/local/bin/expect \n";
+	
+	# seperate admin server and managed server
+	my @row = @$row_aref;
+	my $admin_server_row = shift @row;
+	my @managed_server_row = @row;
+	my $host_check = {};
+	for my $managed_server_row (@managed_server_row) {
+		my $ip = $managed_server_row->{"IP Address"};
+		my $other_info_ip = $ip;
+		$other_info_ip =~ s/\./_/g;
+		my $other_info_filename = "other_info_".$other_info_ip.".sh";
+		if ( $ip ne $admin_server_row->{"IP Address"} && ! exists $host_check->{$ip}) {
+			$host_check->{$ip} = 1;
+			my $string1 = << "EXPECT1";
+spawn scp -r %s/%s %s@%s:%s
+expect "(yes/no)?" {
+send "yes\r"
+}
+EXPECT1
+			my $string2 = << "EXPECT2";
+expect eof
+expect "Password:" {
+send "%s\r"
+}
+expect eof
+EXPECT2
+			printf $fh $string1, $dynamic_property->{"DOMAIN_DIR"},$managed_server_row->{"Domain name"},$managed_server_row->{"App OS Username"},$managed_server_row->{"IP Address"},$dynamic_property->{"DOMAIN_DIR"};
+			printf $fh $string2, $managed_server_row->{"App OS Password"};
+		}
+	}
+	close $fh;
+}
+
+
+sub run_other_info {
+	my ($row_aref, $weblogic_install_dir, $dynamic_property) = @_;
+	
+	# create expect script to copy domain and execute other info script
+	my $file_name = "run_other_info.expect";
+	open (my $fh, ">", $file_name) or die "cannot create > $file_name : $!";
+	printf $fh "#!/usr/local/bin/expect \n";
+	
+	# seperate admin server and managed server
+	my @row = @$row_aref;
+	my $admin_server_row = shift @row;
+	my @managed_server_row = @row;
+	my $host_check = {};
+	for my $managed_server_row (@managed_server_row) {
+		my $ip = $managed_server_row->{"IP Address"};
+		my $other_info_ip = $ip;
+		$other_info_ip =~ s/\./_/g;
+		my $other_info_filename = "other_info_".$other_info_ip.".sh";
+		if ( $ip ne $admin_server_row->{"IP Address"} && ! exists $host_check->{$ip}) {
+			$host_check->{$ip} = 1;
+			my $string3 = << "EXPECT3";
+spawn ssh %s@%s '%s/%s/domain_create/%s'
+expect "Password:" {
+send "%s\r"
+}
+expect eof
+EXPECT3
+			printf $fh $string3, $managed_server_row->{"App OS Username"}, $managed_server_row->{"IP Address"},INSTALL_FILE_DIR,$weblogic_install_dir,$other_info_filename,$managed_server_row->{"App OS Password"};
+		}
+	}
+	close $fh;
+}
+
 sub create_scp_script {
 	my ($file_handler, $row_aref, $weblogic_install_dir) = @_;
 	
+	my @row = @$row_aref;
+	my $admin_server_row = shift @row;
 	my @uniq_host_row;
 	@uniq_host_row = do { my %seen; grep { !$seen{$_->{"IP Address"}}++ } @$row_aref };	
 	
 	for my $row (@uniq_host_row) {
 		printf $file_handler "scp -r %s %s@%s:%s\n", $weblogic_install_dir, $row->{"App OS Username"}, $row->{"IP Address"}, INSTALL_FILE_DIR;
-		printf $file_handler "ssh %s@%s 'cd %s%s/domain_create && ./set_domain.sh > script_run_result.log &'\n", $row->{"App OS Username"}, $row->{"IP Address"}, INSTALL_FILE_DIR, $weblogic_install_dir;
-	}	
+	}
+	printf $file_handler "ssh %s@%s 'cd %s%s/domain_create && ./set_domain.sh > script_run_result.log &'\n\n", $admin_server_row->{"App OS Username"}, $admin_server_row->{"IP Address"}, INSTALL_FILE_DIR, $weblogic_install_dir;
 }
 
 1;
