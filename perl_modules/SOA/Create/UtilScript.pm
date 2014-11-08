@@ -80,14 +80,13 @@ sub create_other_info_script {
 		printf {$ip_to_file_handler{$host}} "#node %s\n", $row->{"Instance Name"};
 		printf {$ip_to_file_handler{$host}} "[[ -e %s ]] && rm -rf %s && echo \"%s dir deleted\"\n", $node_log_dir, $node_log_dir, $node_log_dir;
 		printf {$ip_to_file_handler{$host}} "mkdir -p %s\n", $row->{"Log File"};
-		printf {$ip_to_file_handler{$host}} "ln -s %s %s\n", $row->{"Log File"}, $node_log_dir;
-		printf {$ip_to_file_handler{$host}} "echo soft link for %s created\n\n", $row->{"Instance Name"};
+		printf {$ip_to_file_handler{$host}} "ln -s %s %s && echo \"soft link for %s created\"\n\n", $row->{"Log File"}, $node_log_dir, $row->{"Instance Name"};
 	}
 	
 	# copy start script
 	for my $host (keys %ip_to_file_handler) {
 		printf {$ip_to_file_handler{$host}} "#copy start script\n";
-		printf {$ip_to_file_handler{$host}} "cp %s/%s/start_script/$host/* %s/%s/bin\n\n", INSTALL_FILE_DIR, $weblogic_install_dir, $dynamic_property->{"DOMAIN_DIR"}, $row_aref->[0]->{"Domain name"};
+		printf {$ip_to_file_handler{$host}} "cp %s/%s/start_script/$host/* %s/%s/bin && echo \"cp start script finished\" \n", INSTALL_FILE_DIR, $weblogic_install_dir, $dynamic_property->{"DOMAIN_DIR"}, $row_aref->[0]->{"Domain name"};
 	}
 	
 	# close file handler
