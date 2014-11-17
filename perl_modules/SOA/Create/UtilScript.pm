@@ -187,7 +187,7 @@ EXPECT3
 }
 
 sub create_scp_script {
-	my ($file_handler, $row_aref, $weblogic_install_dir) = @_;
+	my ($file_handler, $row_aref, $weblogic_install_dir, $dynamic_property) = @_;
 	
 	my @row = @$row_aref;
 	my $admin_server_row = shift @row;
@@ -197,7 +197,10 @@ sub create_scp_script {
 	for my $row (@uniq_host_row) {
 		printf $file_handler "scp -r %s %s@%s:%s\n", $weblogic_install_dir, $row->{"App OS Username"}, $row->{"IP Address"}, INSTALL_FILE_DIR;
 	}
-	printf $file_handler "ssh %s@%s 'cd %s%s/domain_create && ./set_domain.sh > script_run_result.log &'\n\n", $admin_server_row->{"App OS Username"}, $admin_server_row->{"IP Address"}, INSTALL_FILE_DIR, $weblogic_install_dir;
+	
+	if($dynamic_property->{'DOMAIN_TYPE'} eq 'WLS') {
+		printf $file_handler "ssh %s@%s 'cd %s%s/domain_create && ./set_domain.sh > script_run_result.log &'\n\n", $admin_server_row->{"App OS Username"}, $admin_server_row->{"IP Address"}, INSTALL_FILE_DIR, $weblogic_install_dir;
+	}
 }
 
 1;

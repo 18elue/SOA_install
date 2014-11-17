@@ -26,8 +26,12 @@ sub create_one_input_file {
 	# create input.properties file
 	my $input_file_name = "wls_input.properties";
 	open (my $input_file_handler, ">", $input_file_name) or die "cannot create > $input_file_name : $!";
-
-	printf $input_file_handler "WEBLOGIC_USER=weblogic\n";
+	
+	if ($dynamic_property->{'DOMAIN_TYPE'} eq 'WLS') {
+		printf $input_file_handler "WEBLOGIC_USER=weblogic\n";
+	} else {
+		printf $input_file_handler "WEBLOGIC_USER=system\n";
+	}
 	printf $input_file_handler "WEBLOGIC_PWD=%s\n", $admin_server_row->{"Weblogic Password"};
 	printf $input_file_handler "DOMAIN_NAME=%s\n\n", $admin_server_row->{"Domain name"};
 
@@ -35,7 +39,9 @@ sub create_one_input_file {
 	printf $input_file_handler "DOMAIN_DIR=%s\n", $dynamic_property->{"DOMAIN_DIR"};
 	printf $input_file_handler "DOMAIN_TEMPLATE=%s\n", $dynamic_property->{"DOMAIN_TEMPLATE"};
 	printf $input_file_handler "WLST_PATH=%s\n", $dynamic_property->{"WLST_PATH"};
-	printf $input_file_handler "JAVA_HOME=%s\n\n", $dynamic_property->{"JAVA_HOME"};;
+	printf $input_file_handler "JAVA_HOME=%s\n\n", $dynamic_property->{"JAVA_HOME"};
+
+	printf $input_file_handler "DOMAIN_TYPE=%s\n\n", $dynamic_property->{"DOMAIN_TYPE"};
 
 	printf $input_file_handler "ADMIN_SERVER_NAME=%s\n", $admin_server_row->{"Instance Name"};
 	printf $input_file_handler "ADMIN_SERVER_PORT=%s\n", $admin_server_row->{"HTTP Port"};

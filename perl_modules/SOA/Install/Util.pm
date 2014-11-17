@@ -93,6 +93,8 @@ sub hash_data_preprocess {
 		elsif ($obj->{"Instance Type"} =~ /Manage/i) {
 			$obj->{"Instance Type"} = 'Manage';
 		}
+		elsif ($obj->{"Instance Type"} =~ /soa|osb|jms|core/i) {
+		}
 		else {
 			warn "the value of Instance Type need to be either Admin or Manage!";
 			exit 1;
@@ -180,7 +182,7 @@ sub divide_into_domains {
 	}
 	
 	for my $obj (@$hash_data_aref) {
-		if ($obj->{"Instance Type"} eq 'Manage') {
+		if ($obj->{"Instance Type"} =~ /Manage|soa|osb|jms|core/i) {
 			push @current_group, $obj;
 		}
 		if ($obj->{"Instance Type"} eq 'Admin') {
