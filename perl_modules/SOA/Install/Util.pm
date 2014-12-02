@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use SOA::Constant qw(LOG_FILE XMS XMX MAXPERMSIZE);
+use SOA::Constant qw(LOG_FILE XMS XMX MAXPERMSIZE DEFAULT_WLS_PASSWORD);
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -93,7 +93,7 @@ sub hash_data_preprocess {
 		elsif ($obj->{"Instance Type"} =~ /Manage/i) {
 			$obj->{"Instance Type"} = 'Manage';
 		}
-		elsif ($obj->{"Instance Type"} =~ /soa|osb|jms|core/i) {
+		elsif ($obj->{"Instance Type"} =~ /soa|osb|osr|jms|core/i) {
 		}
 		else {
 			warn "the value of Instance Type need to be either Admin or Manage!";
@@ -120,6 +120,10 @@ sub set_default_configuration {
 		}
 		if (!$obj->{"XX:MaxPermSize(G)"}) {
 			$obj->{"XX:MaxPermSize(G)"} = MAXPERMSIZE;
+		}
+		
+		if ($obj->{"Instance Type"} eq 'Admin' && !$obj->{"Weblogic Password"}) {
+			$obj->{"Weblogic Password"} = DEFAULT_WLS_PASSWORD;
 		}
 	}
 	
