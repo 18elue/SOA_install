@@ -238,4 +238,4 @@ try:
     finish_edit()
 except:
     print 'in except'
-
+    dumpStack()
