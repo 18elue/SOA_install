@@ -32,8 +32,9 @@ sub each_domain_check {
 		for my $server (@managed_server) {
 			my $instance_name = $server->{"Instance Name"};
 			my $host = $server->{"IP Address"};
+			my $component = $server->{"Component"};
 			if ($instance_name_check{$instance_name}) {
-				print "WARNNING: find duplicated instance name $instance_name in host $host\n";
+				print "WARNNING: find duplicated instance name $instance_name in host $host, componet $component\n";
 			}
 			else {
 				$instance_name_check{$instance_name} = 1;
@@ -57,15 +58,20 @@ sub uid_gid_check {
 		my $group = $server->{"Group name"};
 		my $gid = $server->{"GID"};
 		my $host = $server->{"IP Address"};
-		
-		if ($UID_check{$uid} && $UID_check{$uid} ne $user) {
-			print "WARNING: find duplicated UID $uid for both $UID_check{$uid} and $user in host $host\n";
+		my $component = $server->{"Component"};
+		if (!$uid || !$user) {
+			print "WARNING: NO UID or USER in host $host, componet $component\n";
+		}elsif ($UID_check{$uid} && $UID_check{$uid} ne $user) {
+			print "WARNING: find duplicated UID $uid for both $UID_check{$uid} and $user in host $host, componet $component\n";
 		}else {
 			$UID_check{$uid} = $user;
 		}
 		
-		if ($GID_check{$gid} && $GID_check{$gid} ne $group) {
-			print "WARNING: find duplicated GID $gid for both $GID_check{$gid} and $group in host $host\n";
+		if (!$gid || !$group) {
+			print "WARNING: NO GID or GROUP in host $host, componet $component\n";
+		}
+		elsif ($GID_check{$gid} && $GID_check{$gid} ne $group) {
+			print "WARNING: find duplicated GID $gid for both $GID_check{$gid} and $group in host $host, componet $component\n";
 		}else {
 			$GID_check{$gid} = $group
 		}
@@ -81,6 +87,7 @@ sub host_domain_port_check {
 	for my $domain (@$domains_aref_bak) {
 		my $admin_server = $domain->[0];
 		my $domain_name = $admin_server->{"Domain name"};
+		my $component = $admin_server->{"Component"};
 		my @host = map{$_->{"IP Address"}}@$domain;
 		@host = do {my %seen; grep {!$seen{$_}++} @host};
 		for my $host (@host) {
@@ -88,7 +95,7 @@ sub host_domain_port_check {
 				$domain_name_check{$host} = {};
 				$domain_name_check{$host}->{$domain_name} = 1;
 			}elsif ($domain_name_check{$host}->{$domain_name}) {
-				print "WARNING: find duplicated domain name for host $host\n";
+				print "WARNING: find duplicated domain name for host $host, componet $component\n";
 			}else {
 				$domain_name_check{$host}->{$domain_name} = 1;
 			}
@@ -104,13 +111,13 @@ sub host_domain_port_check {
 		my $https_port = $server->{"HTTPS Port"};
 		my $admin_port = $server->{"Admin Port"};
 		my $host = $server->{"IP Address"};
-		
+		my $component = $server->{"Component"};
 		# http port check
 		if ( !$http_port_check{$host} ) {
 			$http_port_check{$host} = {};
 			$http_port_check{$host}->{$http_port} = 1;
 		}elsif ($http_port_check{$host}->{$http_port}) {
-			print "WARNING: find duplicated http port $http_port for host $host\n";
+			print "WARNING: find duplicated http port $http_port for host $host, componet $component\n";
 		}else {
 			$http_port_check{$host}->{$http_port} = 1;
 		}
