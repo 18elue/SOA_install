@@ -30,7 +30,7 @@ sub create_one_input_file {
 	if ($dynamic_property->{'DOMAIN_TYPE'} eq 'WLS') {
 		printf $input_file_handler "WEBLOGIC_USER=weblogic\n";
 	} else {
-		printf $input_file_handler "WEBLOGIC_USER=system\n";
+		printf $input_file_handler "WEBLOGIC_USER=weblogic\n";
 	}
 	printf $input_file_handler "WEBLOGIC_PWD=%s\n", $admin_server_row->{"Weblogic Password"};
 	printf $input_file_handler "DOMAIN_NAME=%s\n\n", $admin_server_row->{"Domain name"};
@@ -48,9 +48,9 @@ sub create_one_input_file {
 	printf $input_file_handler "ADMIN_SERVER_HTTPS_PORT=%s\n", $admin_server_row->{"HTTPS Port"};
 	printf $input_file_handler "ADMIN_SERVER_ADDRESS=%s\n", $admin_server_row->{"IP Address"};
 	printf $input_file_handler "ADMIN_LOG_DIR=%s\n", $admin_server_row->{"Log File"};
-	printf $input_file_handler "ADMIN_SERVER_XMS=%s\n", $admin_server_row->{"Xms(G)"};
-	printf $input_file_handler "ADMIN_SERVER_XMX=%s\n", $admin_server_row->{"Xmx(G)"};
-	printf $input_file_handler "ADMIN_SERVER_MAXPERMSIZE=%s\n\n", $admin_server_row->{"XX:MaxPermSize(G)"};
+	printf $input_file_handler "ADMIN_SERVER_XMS=%s\n", $admin_server_row->{"Xms(MB)"};
+	printf $input_file_handler "ADMIN_SERVER_XMX=%s\n", $admin_server_row->{"Xmx(MB)"};
+	printf $input_file_handler "ADMIN_SERVER_MAXPERMSIZE=%s\n\n", $admin_server_row->{"XX:MaxPermSize(MB)"};
 
 	if ($dynamic_property->{"create_machine_flag"}) {
 		# get all machines
@@ -80,9 +80,9 @@ sub create_one_input_file {
 		printf $input_file_handler "MANAGED_SERVER_%d_MACHINE=%s\n", $index, $managed_server->{"VM Name"};
 		printf $input_file_handler "MANAGED_SERVER_%d_CLUSTER=%s\n", $index, $managed_server->{"Cluster name"};
 		printf $input_file_handler "MANAGED_SERVER_%d_LOG_DIR=%s\n", $index, $managed_server->{"Log File"};
-		printf $input_file_handler "MANAGED_SERVER_%d_XMS=%s\n", $index, $managed_server->{"Xms(G)"};
-		printf $input_file_handler "MANAGED_SERVER_%d_XMX=%s\n", $index, $managed_server->{"Xmx(G)"};
-		printf $input_file_handler "MANAGED_SERVER_%d_MAXPERMSIZE=%s\n\n", $index, $managed_server->{"XX:MaxPermSize(G)"};
+		printf $input_file_handler "MANAGED_SERVER_%d_XMS=%s\n", $index, $managed_server->{"Xms(MB)"};
+		printf $input_file_handler "MANAGED_SERVER_%d_XMX=%s\n", $index, $managed_server->{"Xmx(MB)"};
+		printf $input_file_handler "MANAGED_SERVER_%d_MAXPERMSIZE=%s\n\n", $index, $managed_server->{"XX:MaxPermSize(MB)"};
 		$index += 1;
 	}
 

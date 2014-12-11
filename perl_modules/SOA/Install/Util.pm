@@ -107,19 +107,19 @@ sub hash_data_preprocess {
 sub set_default_configuration {
 	my ($hash_data_aref) = @_;
 
-	#set default value if no specific set, like log dir,Xms(G),Xmx(G),XX:MaxPermSize(G)
+	#set default value if no specific set, like log dir,Xms(MB),Xmx(MB),XX:MaxPermSize(MB)
 	for my $obj (@$hash_data_aref) {
 		if (!$obj->{"Log File"}) {
 			$obj->{"Log File"} = sprintf LOG_FILE, $obj->{"Domain name"}, $obj->{"Instance Name"};
 		}
-		if (!$obj->{"Xms(G)"}) {
-			$obj->{"Xms(G)"} = XMS;
+		if (!$obj->{"Xms(MB)"}) {
+			$obj->{"Xms(MB)"} = XMS;
 		}
-		if (!$obj->{"Xmx(G)"}) {
-			$obj->{"Xmx(G)"} = XMX;
+		if (!$obj->{"Xmx(MB)"}) {
+			$obj->{"Xmx(MB)"} = XMX;
 		}
-		if (!$obj->{"XX:MaxPermSize(G)"}) {
-			$obj->{"XX:MaxPermSize(G)"} = MAXPERMSIZE;
+		if (!$obj->{"XX:MaxPermSize(MB)"}) {
+			$obj->{"XX:MaxPermSize(MB)"} = MAXPERMSIZE;
 		}
 		
 		if ($obj->{"Instance Type"} eq 'Admin' && !$obj->{"Weblogic Password"}) {
