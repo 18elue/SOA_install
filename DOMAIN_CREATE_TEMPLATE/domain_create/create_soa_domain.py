@@ -263,7 +263,7 @@ try:
     start_edit()
     domain_configuration(cluster_dict)
     server_configuration(symbol_table) 
-    set_passwd_validator()
+    #set_passwd_validator()
     finish_edit()
 except:
     print 'in except'
