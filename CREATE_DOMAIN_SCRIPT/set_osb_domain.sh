@@ -17,3 +17,7 @@ if [[ $ADMIN_SERVER_ADDRESS = $ip ]] && [[ $DOMAIN_TYPE = OSB ]]; then
     expect cp_domain.expect
 fi 
 
+# start the osb admin server
+cd $DOMAIN_HOME/bin
+nohup ./startWebLogic.sh &
+

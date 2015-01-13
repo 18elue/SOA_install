@@ -17,3 +17,6 @@ if [[ $ADMIN_SERVER_ADDRESS = $ip ]] && [[ $DOMAIN_TYPE = SOA ]]; then
     expect cp_domain.expect
 fi 
 
+# start the soa admin server
+cd $DOMAIN_HOME/bin
+nohup ./startWebLogic.sh &
