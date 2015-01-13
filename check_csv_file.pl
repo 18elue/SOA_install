@@ -17,7 +17,7 @@ use SOA::Install::Util qw(
 
 my ($hash_data_aref, $domain_unit_aref) = get_data_aref();
 each_domain_check($domain_unit_aref);
-uid_gid_check($hash_data_aref);
+#uid_gid_check($hash_data_aref);
 host_domain_port_check($hash_data_aref, $domain_unit_aref);
 
 sub each_domain_check {
