@@ -32,7 +32,7 @@ sub get_data_from_csv {
 	while(my $line = <$csv_file_handler>){
 		$/="\r\n";
 		chomp $line;
-		next if !$line;  # ignore blank line
+		next if !$line || $line =~ /^(\w|\s)*,,,,,,,,/;  # ignore blank line
 		my @row = split ',' , $line;
 		push @list_data, \@row;
 	}
@@ -74,12 +74,13 @@ sub list_to_hash {
 
 sub hash_data_preprocess {
 	my ($hash_data_aref) = @_;
-	
+
 	# change component content
 	for my $obj (@$hash_data_aref) {
 		$obj->{"Component"} =~ s/ /_/g;
 		$obj->{"Component"} =~ s/\(/_/g;
 		$obj->{"Component"} =~ s/\)/_/g;
+		$obj->{"Component"} =~ s/\//_/g;
 	}
 	
 	#delete columns which does not have domain name
