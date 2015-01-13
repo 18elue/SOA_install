@@ -4,6 +4,9 @@
 # get dir name
 weblogic_install_dir=$1
 
+# this is for following use
+source wls_input.properties
+
 # create dir from TEMPLATE, add file wls_input.properties, other_info.sh to dir
 [[ -e $weblogic_install_dir ]] && rm -rf $weblogic_install_dir && echo "dir $weblogic_install_dir deleted"
 cp -r DOMAIN_CREATE_TEMPLATE $weblogic_install_dir
@@ -13,9 +16,26 @@ mv other_info*.sh $weblogic_install_dir/domain_create
 mv cp_domain.expect $weblogic_install_dir/domain_create
 mv run_other_info.expect $weblogic_install_dir/domain_create
 
-# create start script
-source $weblogic_install_dir/domain_create/wls_input.properties
+# copy create domain scripts to $weblogic_install_dir/domain_create
+if [[ $DOMAIN_TYPE = "WLS" ]]
+then
+	cp CREATE_DOMAIN_SCRIPT/create_wls_domain.py $weblogic_install_dir/domain_create
+	cp CREATE_DOMAIN_SCRIPT/set_domain.sh $weblogic_install_dir/domain_create
+elif [[ $DOMAIN_TYPE = "SOA" ]]
+then
+	cp CREATE_DOMAIN_SCRIPT/create_soa_domain.py $weblogic_install_dir/domain_create
+	cp CREATE_DOMAIN_SCRIPT/set_soa_domain.sh $weblogic_install_dir/domain_create
+	cp CREATE_DOMAIN_SCRIPT/osb_soa_input.properties $weblogic_install_dir/domain_create
+elif [[ $DOMAIN_TYPE = "OSB" ]]
+then
+	cp CREATE_DOMAIN_SCRIPT/create_osb_domain.py $weblogic_install_dir/domain_create
+	cp CREATE_DOMAIN_SCRIPT/set_osb_domain.sh $weblogic_install_dir/domain_create
+	cp CREATE_DOMAIN_SCRIPT/osb_soa_input.properties $weblogic_install_dir/domain_create
+else
+	echo "ERROR: domain type is not in WLS SOA OSB"
+fi
 
+# create start script
 ## create admin server start script
 script_home=/home/6375ly/SOA_install_script/$weblogic_install_dir/start_script
 cp -r $script_home/template/admin_node $script_home/$ADMIN_SERVER_ADDRESS && echo "admin server start script dir created"
