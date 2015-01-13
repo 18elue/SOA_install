@@ -56,7 +56,7 @@ sub create_one_input_file {
 		# get all machines
 		my @machine;
 		for my $row(@$row_aref) {
-			push @machine, $row->{"VM Name"};
+			push @machine, $row->{"Zone Name"};
 		}
 		@machine = do { my %seen; grep { !$seen{$_}++ } @machine };
 		
@@ -77,7 +77,7 @@ sub create_one_input_file {
 		printf $input_file_handler "MANAGED_SERVER_%d_PORT=%s\n", $index, $managed_server->{"HTTP Port"};
 		printf $input_file_handler "MANAGED_SERVER_%d_HTTPS_PORT=%s\n", $index, $managed_server->{"HTTPS Port"};
 		printf $input_file_handler "MANAGED_SERVER_%d_ADDRESS=%s\n", $index, $managed_server->{"IP Address"};
-		printf $input_file_handler "MANAGED_SERVER_%d_MACHINE=%s\n", $index, $managed_server->{"VM Name"};
+		printf $input_file_handler "MANAGED_SERVER_%d_MACHINE=%s\n", $index, $managed_server->{"Zone Name"};
 		printf $input_file_handler "MANAGED_SERVER_%d_CLUSTER=%s\n", $index, $managed_server->{"Cluster name"};
 		printf $input_file_handler "MANAGED_SERVER_%d_LOG_DIR=%s\n", $index, $managed_server->{"Log File"};
 		printf $input_file_handler "MANAGED_SERVER_%d_XMS=%s\n", $index, $managed_server->{"Xms(MB)"};
