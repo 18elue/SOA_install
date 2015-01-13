@@ -6,9 +6,7 @@ use warnings;
 use Data::Dumper;
 use SOA::Constant qw(
 	ORACLE_HOME
-	LOG_DISK_MOUNTED_DIR APP_DISK_MOUNTED_DIR LOG_SOFT_LINK APP_SOFT_LINK
-	SRC_WLS_FILE_DIR SRC_WLS_FILE_NAME EXTRACTED_WLS_FILE_NAME INSTALL_FILE_DIR
-	SRC_SOA_FILE_DIR SRC_SOA_FILE_NAME
+	INSTALL_FILE_DIR
 );
 require Exporter;
 our @ISA = qw(Exporter);
@@ -20,39 +18,6 @@ our @EXPORT_OK = qw(
 	cp_domain
 	run_other_info
 );
-
-sub create_temp_script_for_root {
-	my ($row_aref, $dynamic_property) = @_;
-	my $file_name = "root_temp_script.sh";
-	open (my $fh, ">", $file_name) or die "cannot create > $file_name : $!";
-	printf $fh "rm -rf %s \n", LOG_SOFT_LINK;
-	printf $fh "ln -s %s %s \n", LOG_DISK_MOUNTED_DIR, LOG_SOFT_LINK;
-	printf $fh "rm -rf %s \n", APP_SOFT_LINK;
-	printf $fh "ln -s %s %s \n", APP_DISK_MOUNTED_DIR, APP_SOFT_LINK;	
-	printf $fh "chown -R %s:%s %s \n", $row_aref->[0]->{"App OS Username"}, $row_aref->[0]->{"Group name"}, LOG_DISK_MOUNTED_DIR;
-	printf $fh "chown -R %s:%s %s \n", $row_aref->[0]->{"App OS Username"}, $row_aref->[0]->{"Group name"}, APP_DISK_MOUNTED_DIR;
-	printf $fh "rm -rf %s \n", $dynamic_property->{"BEAHOME"};
-	close $fh;
-}
-
-sub create_temp_script_for_user {
-	my ($row_aref, $dynamic_property, $SOA_flag) = @_;
-	my $file_name = "user_temp_script.sh";
-	open (my $fh, ">", $file_name) or die "cannot create > $file_name : $!";
-	if ($SOA_flag) {
-		printf $fh "scp -r %s %s \n", SRC_SOA_FILE_DIR.SRC_SOA_FILE_NAME, ORACLE_HOME;
-		printf $fh "tar -xf %s -C %s \n", ORACLE_HOME.SRC_SOA_FILE_NAME, ORACLE_HOME;
-		printf $fh "rm -rf %s \n", ORACLE_HOME.SRC_SOA_FILE_NAME;
-	} else {
-		printf $fh "scp -r %s %s \n", SRC_WLS_FILE_DIR.SRC_WLS_FILE_NAME, ORACLE_HOME;
-		printf $fh "tar -xf %s -C %s \n", ORACLE_HOME.SRC_WLS_FILE_NAME, ORACLE_HOME;
-		printf $fh "rm -rf %s \n", ORACLE_HOME.SRC_WLS_FILE_NAME;
-		printf $fh "ln -s %s %s \n", ORACLE_HOME.EXTRACTED_WLS_FILE_NAME, $dynamic_property->{"BEAHOME"};
-	}
-#	printf $fh "chmod -R 777 %s \n", LOG_DISK_MOUNTED_DIR;
-#	printf $fh "chmod -R 777 %s \n", APP_DISK_MOUNTED_DIR;
-	close $fh;
-}
 
 # this func is used to create extra shell command like create log dir
 sub create_other_info_script {

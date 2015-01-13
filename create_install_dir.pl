@@ -91,9 +91,6 @@ for my $domain_aref (@$group_data_aref) {
 	create_secureCRT_config($domain_aref);
 	create_scp_script($scp_file_handler, $domain_aref, $weblogic_install_dir, $dynamic_property);
 	
-	#this is temporary used
-	create_temp_script_for_root($domain_aref, $dynamic_property);
-	create_temp_script_for_user($domain_aref, $dynamic_property, $SOA_flag);
 	system "./create_weblogic_install_dir.bash", $weblogic_install_dir;
 }
 close $scp_file_handler;
