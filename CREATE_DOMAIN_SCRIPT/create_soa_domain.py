@@ -80,9 +80,7 @@ def set_server(names):
 
 def set_JDBC():
     datasource_detail = {
-        'EDNDataSource' : 'SOAINFRA',
         'EDNLocalTxDataSource' : 'SOAINFRA',
-        'SOADataSource' : 'SOAINFRA',
         'SOALocalTxDataSource' : 'SOAINFRA',
         'mds-owsm' : 'MDS',
         'mds-soa' : 'MDS',
@@ -95,6 +93,19 @@ def set_JDBC():
         set('PasswordEncrypted', DB_PASSWORD)
         cd('Properties/NO_NAME_0/Property/user')
         set('Value','%s_%s' % (DB_PREFIX, datasource_detail[ds]))
+
+    XA_datasource_detail = {
+        'EDNDataSource' : 'SOAINFRA',
+        'SOADataSource' : 'SOAINFRA'
+    }
+    for ds in XA_datasource_detail.keys():
+        cd('/JDBCSystemResource/%s/JdbcResource/%s/JDBCDriverParams/NO_NAME_0' % (ds,ds))
+        set('DriverName','oracle.jdbc.xa.client.OracleXADataSource')
+        set('URL','jdbc:oracle:thin:@%s:1521/%s' % (DB_HOST, DB_SERVICE_NAME))
+        set('PasswordEncrypted', DB_PASSWORD)
+        cd('Properties/NO_NAME_0/Property/user')
+        set('Value','%s_%s' % (DB_PREFIX, XA_datasource_detail[ds]))
+
     print 'finish set jdbc'
 
 def copyfile(src, dest):
