@@ -33,16 +33,30 @@ sub each_domain_check {
 			my $instance_name = $server->{"Instance Name"};
 			my $host = $server->{"IP Address"};
 			my $component = $server->{"Component"};
+			
 			if ($instance_name_check{$instance_name}) {
 				print "WARNNING: find duplicated instance name $instance_name in host $host, componet $component\n";
 			}
 			else {
 				$instance_name_check{$instance_name} = 1;
 			}
+			
+			# http port should not be the same as https port
+			my $http_port = $server->{"HTTP Port"};
+			my $https_port = $server->{"HTTPS Port"};
+			if ($http_port eq $https_port) {
+				print "WARNNING: find https port $https_port the same as http port, instance name $instance_name in host $host, componet $component\n";
+			}
+
+			# usually zone name should not start with VM
+
+			my $zone_name = $server->{"Zone Name"};
+			if ($zone_name =~ /VM/) {
+				print "WARNNING: Zone Name should not start with VM instance name $instance_name in host $host, componet $component\n";
+			}
 		}
 		
-		# http port should not repeat for the same host
-		
+		# http port should not repeat for the same host	
 	}
 }
 
