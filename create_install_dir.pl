@@ -60,7 +60,7 @@ for my $domain_aref (@$group_data_aref) {
 	my $admin_server = $domain_aref->[0];
 	my $managed_server = $domain_aref->[1];
 	
-	if ($admin_server->{'Software'} =~ /SOA/i) {
+	if ($admin_server->{'Software'} =~ /SOA|OSB/i) {
 		$beahome = ORACLE_HOME.'mw';
 		$create_machine_flag = 0;
 	} else {
